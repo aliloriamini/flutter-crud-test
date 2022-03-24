@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
+import 'package:mc_crud_test/models/Collections/Customer.dart';
+import 'package:mc_crud_test/models/Customer.dart';
 import 'package:mc_crud_test/utils/Validators.dart';
 import '../../colors.dart' as color;
 import '../controller/CustomerController.dart';
-import '../utils/CardNumberInputFormatter.dart';
 import '../widgets/AppBar.dart';
 import 'package:intl/intl.dart';
 
@@ -12,7 +13,13 @@ class CreateCustomer extends StatelessWidget{
   final _formKey = GlobalKey<FormState>();
   CreateCustomer({Key? key}) : super(key: key);
   final CustomerController _customerController = Get.put(CustomerController());
-  // DateTime selectedDate = DateTime.now();
+  String? firstName;
+  String? lastName;
+  String? email;
+  String? phoneNumber;
+  String? bankAccountNumber;
+  DateTime dateOfBirth = DateTime.now();
+
   @override
   Widget build(BuildContext context) {
     return
@@ -20,7 +27,7 @@ class CreateCustomer extends StatelessWidget{
           backgroundColor: color.mainBodyApp,
           appBar: PreferredSize(
               preferredSize: Size.fromHeight(60),
-              child: appBarClass(true,'create Customer',context)
+              child: appBarClass('create Customer')
           ),
           body: SingleChildScrollView(
             child:
@@ -67,6 +74,9 @@ class CreateCustomer extends StatelessWidget{
                                 }
                                 return null;
                               },
+                              onSaved: (value){
+                                firstName = value;
+                              },
                             ),
                             const SizedBox(height: 5,),
                             const Text('Last name:',style: TextStyle(fontWeight: FontWeight.bold,fontSize: 18),),
@@ -81,6 +91,9 @@ class CreateCustomer extends StatelessWidget{
                                   return 'Last name must have value';
                                 }
                                 return null;
+                              },
+                              onSaved: (value){
+                                lastName = value;
                               },
                             ),
                             const SizedBox(height: 5,),
@@ -107,6 +120,7 @@ class CreateCustomer extends StatelessWidget{
                                               lastDate: DateTime(2101));
                                           if (picked != null && picked != _customerController.selectedDate.value) {
                                             _customerController.selectedDate.value = picked;
+                                            dateOfBirth = picked;
                                           }
                                           },
                                         ),
@@ -120,6 +134,9 @@ class CreateCustomer extends StatelessWidget{
                               ),
                               keyboardType: TextInputType.phone,
                               validator: (value) =>Validators.phoneNumberValidator(value!),
+                              onSaved: (value){
+                                phoneNumber = value;
+                              },
                             ),
                             const SizedBox(height: 5,),
                             const Text('Email:',style: TextStyle(fontWeight: FontWeight.bold,fontSize: 18),),
@@ -129,8 +146,10 @@ class CreateCustomer extends StatelessWidget{
                                 hintText: 'Email',
                               ),
                               keyboardType: TextInputType.emailAddress,
-                              validator: (value) => Validators.validateEmail(value!)
-                              ,
+                              validator: (value) => Validators.validateEmail(value!),
+                              onSaved: (value){
+                                email = value;
+                              },
                             ),
                             const SizedBox(height: 5,),
                             const Text('Bank Account Number:',style: TextStyle(fontWeight: FontWeight.bold,fontSize: 18),),
@@ -143,17 +162,39 @@ class CreateCustomer extends StatelessWidget{
                               // inputFormatters: [
                               //   CardNumberInputFormatter(),
                               // ],
+                              onSaved: (value){
+                                bankAccountNumber = value;
+                              },
                             ),
                             Row(
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: [
                               ElevatedButton(
-                                onPressed: () {
+                                onPressed: () async{
+                                  CustomerModel _customerModel = CustomerModel();
+                                  _customerModel.getCustomers();
                                   if (_formKey.currentState!.validate()) {
-                                    ScaffoldMessenger.of(context).showSnackBar(
-                                      const SnackBar(content: Text('submit successful')),
-                                    );
+                                    _formKey.currentState!.save();
+                                    final newCustomer = Customer()
+                                      ..firstName = firstName.toString()
+                                      ..lastName = lastName.toString()
+                                      ..email = email.toString()
+                                      ..bankAccountNumber = bankAccountNumber.toString()
+                                      ..phoneNumber = phoneNumber.toString()
+                                      ..dateOfBirth = dateOfBirth
+                                    ;
+                                    bool success = await _customerModel.createCustomer(newCustomer);
+                                    if(success) {
+                                      ScaffoldMessenger.of(context).showSnackBar(
+                                        const SnackBar(content: Text('submit successful')),
+                                      );
+                                    }else{
+                                      ScaffoldMessenger.of(context).showSnackBar(
+                                        const SnackBar(content: Text('your data had been submit before.')),
+                                      );
+                                    }
                                   }
+                                  Get.offAllNamed('/');
                                 },
                                 child: const Text('submit'),
                               ),

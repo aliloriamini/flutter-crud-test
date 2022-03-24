@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:mc_crud_test/views/allCustomers.dart';
+import 'package:mc_crud_test/views/updateCustomer.dart';
 import '../../colors.dart' as color;
 import 'views/createCustomer.dart';
 
@@ -21,7 +23,9 @@ class MyApp extends StatelessWidget {
       ),
       initialRoute: '/',
       routes: {
-        "/" : (context) => Directionality(textDirection: TextDirection.ltr, child: CreateCustomer()),
+        "/" : (context) =>  AllCustomer(),
+        "/CreateCustomer" : (context) =>  CreateCustomer(),
+        "/UpdateCustomer" : (context) =>  UpdateCustomer(),
       },
       debugShowCheckedModeBanner: false,
     );
