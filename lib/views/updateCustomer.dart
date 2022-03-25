@@ -198,12 +198,12 @@ class UpdateCustomer extends StatelessWidget{
                                                   ScaffoldMessenger.of(context).showSnackBar(
                                                     const SnackBar(content: Text('submit successful')),
                                                   );
+                                                  Get.offAllNamed('/');
                                                 }else{
                                                   ScaffoldMessenger.of(context).showSnackBar(
                                                     const SnackBar(content: Text('your data had been submit before.')),
                                                   );
                                                 }
-                                                Get.offAllNamed('/');
                                               }
                                             },
                                             child: const Text('submit'),
